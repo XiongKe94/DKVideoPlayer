@@ -2,27 +2,28 @@ apply plugin: 'com.android.library'
 apply from: '../../constants.gradle'
 
 android {
-    compileSdkVersion project.ext.compileSdkVersion
+    namespace 'xyz.doikki.videoplayer.exo'
+    compileSdk project.ext.compileSdkVersion
     buildToolsVersion project.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion project.ext.minSdkVersion
-        targetSdkVersion project.ext.targetSdkVersion
+        minSdk project.ext.minSdkVersion
+        targetSdk project.ext.targetSdkVersion
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':dkplayer-java')
-    api "com.google.android.exoplayer:exoplayer-core:$project.exoPlayerVersion"
-    api "com.google.android.exoplayer:exoplayer-dash:$project.exoPlayerVersion"
-    api "com.google.android.exoplayer:exoplayer-hls:$project.exoPlayerVersion"
-    api "com.google.android.exoplayer:exoplayer-rtsp:$project.exoPlayerVersion"
-    api "com.google.android.exoplayer:extension-rtmp:$project.exoPlayerVersion"
+    api "com.google.android.exoplayer:exoplayer-core:${project.ext.exoPlayerVersion}"
+    api "com.google.android.exoplayer:exoplayer-dash:${project.ext.exoPlayerVersion}"
+    api "com.google.android.exoplayer:exoplayer-hls:${project.ext.exoPlayerVersion}"
+    api "com.google.android.exoplayer:exoplayer-rtsp:${project.ext.exoPlayerVersion}"
+    api "com.google.android.exoplayer:extension-rtmp:${project.ext.exoPlayerVersion}"
 }
 
 ext {

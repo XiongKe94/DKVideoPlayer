@@ -284,7 +284,11 @@ public final class GLSurfaceRenderView extends GLSurfaceView implements IRenderV
 
         @Override
         public synchronized void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            texture = GlUtil.createExternalTexture();
+            try {
+                texture = GlUtil.createExternalTexture();
+            } catch (GlUtil.GlException e) {
+                throw new RuntimeException("Failed to create external texture", e);
+            }
             surfaceTexture = new SurfaceTexture(texture);
             surfaceTexture.setOnFrameAvailableListener(
                     surfaceTexture -> {

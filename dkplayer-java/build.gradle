@@ -2,12 +2,20 @@ apply plugin: 'com.android.library'
 apply from: '../constants.gradle'
 
 android {
-    compileSdkVersion project.ext.compileSdkVersion
+    namespace 'xyz.doikki.videoplayer'
+    compileSdk project.ext.compileSdkVersion
     buildToolsVersion project.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion project.ext.minSdkVersion
-        targetSdkVersion project.ext.targetSdkVersion
+        minSdk project.ext.minSdkVersion
+        targetSdk project.ext.targetSdkVersion
+    }
+    buildFeatures {
+        buildConfig = true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 

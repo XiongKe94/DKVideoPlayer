@@ -1,0 +1,40 @@
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply from: '../../constants.gradle'
+
+android {
+    namespace 'xyz.doikki.videoplayer.media'
+    compileSdk project.ext.compileSdkVersion
+    buildToolsVersion project.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdk project.ext.minSdkVersion
+        targetSdk project.ext.targetSdkVersion
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+def media3_version = "1.9.1"
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':dkplayer-java')
+    api "androidx.media3:media3-exoplayer:$media3_version"
+    api "androidx.media3:media3-exoplayer-dash:$media3_version"
+    api "androidx.media3:media3-exoplayer-hls:$media3_version"
+    api "androidx.media3:media3-exoplayer-rtsp:$media3_version"
+    api "androidx.media3:media3-datasource-rtmp:$media3_version"
+    api "androidx.media3:media3-ui:$media3_version"
+}
+
+ext {
+    PUBLISH_ARTIFACT_ID = 'player-media3-exo'
+}
+
+apply from: '../../publish.gradle'

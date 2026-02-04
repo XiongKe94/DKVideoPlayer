@@ -19,6 +19,7 @@ import xyz.doikki.dkplayer.util.PIPManager
 import xyz.doikki.dkplayer.util.Tag
 import xyz.doikki.dkplayer.util.Utils
 import xyz.doikki.dkplayer.util.cache.ProxyVideoCacheManager
+import xyz.doikki.videoplayer.media.MediaPlayerFactory
 import xyz.doikki.videoplayer.exo.ExoMediaPlayerFactory
 import xyz.doikki.videoplayer.ijk.IjkPlayerFactory
 import xyz.doikki.videoplayer.player.AndroidMediaPlayerFactory
@@ -46,6 +47,9 @@ class MainActivity : BaseActivity<VideoView>(), NavigationBarView.OnItemSelected
         }
         //检测当前是用的哪个播放器
         when (Utils.getCurrentPlayerFactory()) {
+            is MediaPlayerFactory -> {
+                setTitle(resources.getString(R.string.app_name) + " (Media3Exo)")
+            }
             is ExoMediaPlayerFactory -> {
                 setTitle(resources.getString(R.string.app_name) + " (ExoPlayer)")
             }
@@ -83,8 +87,7 @@ class MainActivity : BaseActivity<VideoView>(), NavigationBarView.OnItemSelected
             }
             R.id.cpu_info -> CpuInfoActivity.start(this)
         }
-        if (itemId == R.id.ijk || itemId == R.id.exo || itemId == R.id.media) {
-            //切换播放核心，不推荐这么做，我这么写只是为了方便测试
+        if (itemId == R.id.ijk || itemId == R.id.exo || itemId == R.id.media || itemId == R.id.media3_exo) {
             val config = VideoViewManager.getConfig()
             try {
                 val mPlayerFactoryField = config.javaClass.getDeclaredField("mPlayerFactory")
@@ -102,6 +105,10 @@ class MainActivity : BaseActivity<VideoView>(), NavigationBarView.OnItemSelected
                     R.id.media -> {
                         playerFactory = AndroidMediaPlayerFactory.create()
                         setTitle(resources.getString(R.string.app_name) + " (MediaPlayer)")
+                    }
+                    R.id.media3_exo -> {
+                        playerFactory = MediaPlayerFactory.create()
+                        setTitle(resources.getString(R.string.app_name) + " (Media3Exo)")
                     }
                 }
                 mPlayerFactoryField[config] = playerFactory

@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import xyz.doikki.dkplayer.util.Utils;
 import xyz.doikki.videoplayer.controller.ControlWrapper;
 import xyz.doikki.videoplayer.controller.IControlComponent;
+import xyz.doikki.videoplayer.media.MediaPlayerFactory;
 import xyz.doikki.videoplayer.exo.ExoMediaPlayerFactory;
 import xyz.doikki.videoplayer.ijk.IjkPlayerFactory;
 import xyz.doikki.videoplayer.player.AndroidMediaPlayerFactory;
@@ -81,7 +82,9 @@ public class DebugInfoView extends AppCompatTextView implements IControlComponen
     protected String getCurrentPlayer() {
         String player;
         Object playerFactory = Utils.getCurrentPlayerFactoryInVideoView(mControlWrapper);
-        if (playerFactory instanceof ExoMediaPlayerFactory) {
+        if (playerFactory instanceof MediaPlayerFactory) {
+            player = "Media3Exo";
+        } else if (playerFactory instanceof ExoMediaPlayerFactory) {
             player = "ExoPlayer";
         } else if (playerFactory instanceof IjkPlayerFactory) {
             player = "IjkPlayer";

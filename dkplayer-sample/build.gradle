@@ -91,5 +91,6 @@ dependencies {
     implementation project(':dkplayer-ui')
     implementation project(path: ':dkplayer-players:ijk')
     implementation project(path: ':dkplayer-players:exo')
+    implementation project(path: ':dkplayer-players:media3Exo')
     implementation project(':dkplayer-videocache')
 }

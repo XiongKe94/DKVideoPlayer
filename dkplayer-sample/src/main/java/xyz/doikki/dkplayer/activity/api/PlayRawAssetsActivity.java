@@ -13,6 +13,7 @@ import xyz.doikki.dkplayer.R;
 import xyz.doikki.dkplayer.activity.BaseActivity;
 import xyz.doikki.dkplayer.util.Utils;
 import xyz.doikki.videocontroller.StandardVideoController;
+import xyz.doikki.videoplayer.media.MediaPlayerFactory;
 import xyz.doikki.videoplayer.exo.ExoMediaPlayerFactory;
 import xyz.doikki.videoplayer.player.VideoView;
 
@@ -47,7 +48,7 @@ public class PlayRawAssetsActivity extends BaseActivity<VideoView> {
 
         switch (view.getId()) {
             case R.id.btn_raw:
-                if (playerFactory instanceof ExoMediaPlayerFactory) { //ExoPlayer
+                if (playerFactory instanceof ExoMediaPlayerFactory || playerFactory instanceof MediaPlayerFactory) {
                     DataSpec dataSpec = new DataSpec(RawResourceDataSource.buildRawResourceUri(R.raw.movie));
                     RawResourceDataSource rawResourceDataSource = new RawResourceDataSource(this);
                     try {
@@ -57,15 +58,15 @@ public class PlayRawAssetsActivity extends BaseActivity<VideoView> {
                     }
                     String url = rawResourceDataSource.getUri().toString();
                     mVideoView.setUrl(url);
-                } else { //MediaPlayer,IjkPlayer
+                } else {
                     String url = "android.resource://" + getPackageName() + "/" + R.raw.movie;
                     mVideoView.setUrl(url);
                 }
                 break;
             case R.id.btn_assets:
-                if (playerFactory instanceof ExoMediaPlayerFactory) { //ExoPlayer
+                if (playerFactory instanceof ExoMediaPlayerFactory || playerFactory instanceof MediaPlayerFactory) {
                     mVideoView.setUrl("file:///android_asset/" + "test.mp4");
-                } else { //MediaPlayer,IjkPlayer
+                } else {
                     AssetManager am = getResources().getAssets();
                     AssetFileDescriptor afd = null;
                     try {

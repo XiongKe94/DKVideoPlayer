@@ -1,4 +1,4 @@
-package xyz.doikki.videoplayer.media
+package xyz.doikki.videoplayer.media3
 
 import android.content.Context
 import android.content.res.AssetFileDescriptor
@@ -28,10 +28,10 @@ import xyz.doikki.videoplayer.player.VideoViewManager
  * 基于 AndroidX Media3 ExoPlayer 的播放器实现。
  */
 @UnstableApi
-class MediaPlayer(context: Context) : AbstractPlayer(), Player.Listener {
+class Media3ExoPlayer(context: Context) : AbstractPlayer(), Player.Listener {
 
     protected val appContext: Context = context.applicationContext
-    protected var mediaSourceHelper: MediaSourceHelperImpl = MediaSourceHelper.getInstance(context)
+    protected var mediaSourceHelper: Media3ExoSourceHelperImpl = Media3ExoSourceHelper.getInstance(context)
     protected var internalPlayer: ExoPlayer? = null
     var mediaSource: MediaSource? = null
         protected set

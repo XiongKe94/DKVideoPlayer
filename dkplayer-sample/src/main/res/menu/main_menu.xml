@@ -14,7 +14,7 @@
             <item android:id="@+id/exo"
                 android:title="ExoPlayer"/>
             <item android:id="@+id/media"
-                android:title="MediaPlayer"/>
+                android:title="原生MediaPlayer"/>
             <item android:id="@+id/media3_exo"
                 android:title="Media3Exo"/>
         </menu>

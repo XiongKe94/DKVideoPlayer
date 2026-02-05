@@ -13,7 +13,7 @@ import xyz.doikki.dkplayer.R;
 import xyz.doikki.dkplayer.activity.BaseActivity;
 import xyz.doikki.dkplayer.util.Utils;
 import xyz.doikki.videocontroller.StandardVideoController;
-import xyz.doikki.videoplayer.media.MediaPlayerFactory;
+import xyz.doikki.videoplayer.media3.Media3ExoPlayerFactory;
 import xyz.doikki.videoplayer.exo.ExoMediaPlayerFactory;
 import xyz.doikki.videoplayer.player.VideoView;
 
@@ -48,7 +48,7 @@ public class PlayRawAssetsActivity extends BaseActivity<VideoView> {
 
         switch (view.getId()) {
             case R.id.btn_raw:
-                if (playerFactory instanceof ExoMediaPlayerFactory || playerFactory instanceof MediaPlayerFactory) {
+                if (playerFactory instanceof ExoMediaPlayerFactory || playerFactory instanceof Media3ExoPlayerFactory) {
                     DataSpec dataSpec = new DataSpec(RawResourceDataSource.buildRawResourceUri(R.raw.movie));
                     RawResourceDataSource rawResourceDataSource = new RawResourceDataSource(this);
                     try {
@@ -64,7 +64,7 @@ public class PlayRawAssetsActivity extends BaseActivity<VideoView> {
                 }
                 break;
             case R.id.btn_assets:
-                if (playerFactory instanceof ExoMediaPlayerFactory || playerFactory instanceof MediaPlayerFactory) {
+                if (playerFactory instanceof ExoMediaPlayerFactory || playerFactory instanceof Media3ExoPlayerFactory) {
                     mVideoView.setUrl("file:///android_asset/" + "test.mp4");
                 } else {
                     AssetManager am = getResources().getAssets();

@@ -1,10 +1,11 @@
-package xyz.doikki.videoplayer.media
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.text.TextUtils
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
@@ -21,27 +22,26 @@ import androidx.media3.exoplayer.rtsp.RtspMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import java.io.File
-import java.lang.reflect.Field
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Media3 媒体源辅助类，根据 URI 创建对应的 MediaSource（DASH / HLS / RTSP / RTMP / 渐进式）。
  */
-object MediaSourceHelper {
+object Media3ExoSourceHelper {
 
     @Volatile
-    private var instance: MediaSourceHelperImpl? = null
+    private var instance: Media3ExoSourceHelperImpl? = null
 
     @JvmStatic
-    fun getInstance(context: Context): MediaSourceHelperImpl {
+    fun getInstance(context: Context): Media3ExoSourceHelperImpl {
         return instance ?: synchronized(this) {
-            instance ?: MediaSourceHelperImpl(context.applicationContext).also { instance = it }
+            instance ?: Media3ExoSourceHelperImpl(context.applicationContext).also { instance = it }
         }
     }
 }
 
-class MediaSourceHelperImpl(private val appContext: Context) {
-
+@SuppressLint("UnsafeOptInUsageError")
+class Media3ExoSourceHelperImpl(private val appContext: Context) {
     private val userAgent: String = Util.getUserAgent(appContext, appContext.applicationInfo.name)
     private var httpDataSourceFactory: DefaultHttpDataSource.Factory? = null
     private var cache: Cache? = null

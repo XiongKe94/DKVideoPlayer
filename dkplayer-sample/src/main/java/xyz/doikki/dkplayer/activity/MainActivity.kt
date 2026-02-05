@@ -19,7 +19,7 @@ import xyz.doikki.dkplayer.util.PIPManager
 import xyz.doikki.dkplayer.util.Tag
 import xyz.doikki.dkplayer.util.Utils
 import xyz.doikki.dkplayer.util.cache.ProxyVideoCacheManager
-import xyz.doikki.videoplayer.media.MediaPlayerFactory
+import xyz.doikki.videoplayer.media3.Media3ExoPlayerFactory
 import xyz.doikki.videoplayer.exo.ExoMediaPlayerFactory
 import xyz.doikki.videoplayer.ijk.IjkPlayerFactory
 import xyz.doikki.videoplayer.player.AndroidMediaPlayerFactory
@@ -47,7 +47,7 @@ class MainActivity : BaseActivity<VideoView>(), NavigationBarView.OnItemSelected
         }
         //检测当前是用的哪个播放器
         when (Utils.getCurrentPlayerFactory()) {
-            is MediaPlayerFactory -> {
+            is Media3ExoPlayerFactory -> {
                 setTitle(resources.getString(R.string.app_name) + " (Media3Exo)")
             }
             is ExoMediaPlayerFactory -> {
@@ -57,7 +57,7 @@ class MainActivity : BaseActivity<VideoView>(), NavigationBarView.OnItemSelected
                 setTitle(resources.getString(R.string.app_name) + " (IjkPlayer)")
             }
             is AndroidMediaPlayerFactory -> {
-                setTitle(resources.getString(R.string.app_name) + " (MediaPlayer)")
+                setTitle(resources.getString(R.string.app_name) + " (原生MediaPlayer)")
             }
             else -> {
                 setTitle(resources.getString(R.string.app_name) + " (unknown)")
@@ -104,10 +104,10 @@ class MainActivity : BaseActivity<VideoView>(), NavigationBarView.OnItemSelected
                     }
                     R.id.media -> {
                         playerFactory = AndroidMediaPlayerFactory.create()
-                        setTitle(resources.getString(R.string.app_name) + " (MediaPlayer)")
+                        setTitle(resources.getString(R.string.app_name) + " (原生MediaPlayer)")
                     }
                     R.id.media3_exo -> {
-                        playerFactory = MediaPlayerFactory.create()
+                        playerFactory = Media3ExoPlayerFactory.create()
                         setTitle(resources.getString(R.string.app_name) + " (Media3Exo)")
                     }
                 }

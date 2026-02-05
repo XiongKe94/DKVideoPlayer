@@ -1,5 +1,6 @@
 package xyz.doikki.videoplayer.media3
 
+import Media3ExoSourceHelperImpl
 import android.content.Context
 import android.content.res.AssetFileDescriptor
 import android.view.Surface
@@ -87,11 +88,11 @@ class Media3ExoPlayer(context: Context) : AbstractPlayer(), Player.Listener {
     }
 
     override fun start() {
-        internalPlayer?.setPlayWhenReady(true)
+        internalPlayer?.playWhenReady = true
     }
 
     override fun pause() {
-        internalPlayer?.setPlayWhenReady(false)
+        internalPlayer?.playWhenReady = false
     }
 
     override fun stop() {

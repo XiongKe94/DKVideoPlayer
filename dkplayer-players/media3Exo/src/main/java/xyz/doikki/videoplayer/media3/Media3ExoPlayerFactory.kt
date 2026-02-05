@@ -10,7 +10,8 @@ import xyz.doikki.videoplayer.player.PlayerFactory
  */
 class Media3ExoPlayerFactory : PlayerFactory<Media3ExoPlayer>() {
 
-    @OptIn(UnstableApi::class) override fun createPlayer(context: Context): Media3ExoPlayer {
+    @OptIn(UnstableApi::class)
+    override fun createPlayer(context: Context): Media3ExoPlayer {
         return Media3ExoPlayer(context)
     }
 

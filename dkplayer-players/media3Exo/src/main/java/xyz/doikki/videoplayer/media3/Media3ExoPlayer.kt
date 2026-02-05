@@ -56,13 +56,12 @@ class Media3ExoPlayer(context: Context) : AbstractPlayer(), Player.Listener {
             .setAnalyticsCollector(DefaultAnalyticsCollector(Clock.DEFAULT))
             .build()
             .also { player ->
-                setOptions()
-                @Suppress("DEPRECATION")
                 if (VideoViewManager.getConfig().mIsEnableLog && tSelector is MappingTrackSelector) {
                     player.addAnalyticsListener(EventLogger(tSelector, "Media3"))
                 }
                 player.addListener(this)
             }
+        setOptions()
     }
 
     fun setTrackSelector(selector: TrackSelector?) {
@@ -162,7 +161,7 @@ class Media3ExoPlayer(context: Context) : AbstractPlayer(), Player.Listener {
     }
 
     override fun setOptions() {
-        internalPlayer?.setPlayWhenReady(true)
+        internalPlayer?.playWhenReady = true
     }
 
     override fun setSpeed(speed: Float) {

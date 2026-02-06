@@ -40,14 +40,20 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
     private PlaybackParameters mSpeedPlaybackParameters;
 
     private boolean mIsPreparing;
+    private final CacheConfig mCacheConfig;
 
     private LoadControl mLoadControl;
     private RenderersFactory mRenderersFactory;
     private TrackSelector mTrackSelector;
 
     public ExoMediaPlayer(Context context) {
+        this(context, null);
+    }
+
+    public ExoMediaPlayer(Context context, CacheConfig cacheConfig) {
         mAppContext = context.getApplicationContext();
         mMediaSourceHelper = ExoMediaSourceHelper.getInstance(context);
+        mCacheConfig = cacheConfig;
     }
 
     @Override
@@ -85,7 +91,8 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
 
     @Override
     public void setDataSource(String path, Map<String, String> headers) {
-        mMediaSource = mMediaSourceHelper.getMediaSource(path, headers);
+        boolean use = mCacheConfig != null && mCacheConfig.useBuiltInCache;
+        mMediaSource = mMediaSourceHelper.getMediaSource(path, headers, use, mCacheConfig);
     }
 
     @Override

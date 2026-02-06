@@ -14,6 +14,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import java.util.Map;
 
 import xyz.doikki.dkplayer.widget.player.CustomExoMediaPlayer;
+import xyz.doikki.videoplayer.exo.CacheConfig;
 import xyz.doikki.videoplayer.exo.ExoMediaSourceHelper;
 import xyz.doikki.videoplayer.player.BaseVideoView;
 import xyz.doikki.videoplayer.player.PlayerFactory;
@@ -79,7 +80,8 @@ public class ExoVideoView extends BaseVideoView<CustomExoMediaPlayer> {
 
     @Override
     public void setUrl(String url, Map<String, String> headers) {
-        mMediaSource = mHelper.getMediaSource(url, headers, mIsCacheEnabled);
+        mMediaSource = mHelper.getMediaSource(url, headers, mIsCacheEnabled,
+                CacheConfig.builder().build());
     }
 
     /**

@@ -17,8 +17,10 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
+import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
+import com.google.android.exoplayer2.upstream.cache.CacheKeyFactory;
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.exoplayer2.util.Util;
@@ -26,6 +28,8 @@ import com.google.android.exoplayer2.util.Util;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 public final class ExoMediaSourceHelper {
 
@@ -34,7 +38,7 @@ public final class ExoMediaSourceHelper {
     private final String mUserAgent;
     private final Context mAppContext;
     private HttpDataSource.Factory mHttpDataSourceFactory;
-    private Cache mCache;
+    private final Map<String, Cache> mCaches = new ConcurrentHashMap<>();
 
     private ExoMediaSourceHelper(Context context) {
         mAppContext = context.getApplicationContext();
@@ -53,18 +57,10 @@ public final class ExoMediaSourceHelper {
     }
 
     public MediaSource getMediaSource(String uri) {
-        return getMediaSource(uri, null, false);
+        return getMediaSource(uri, null, false, null);
     }
 
-    public MediaSource getMediaSource(String uri, Map<String, String> headers) {
-        return getMediaSource(uri, headers, false);
-    }
-
-    public MediaSource getMediaSource(String uri, boolean isCache) {
-        return getMediaSource(uri, null, isCache);
-    }
-
-    public MediaSource getMediaSource(String uri, Map<String, String> headers, boolean isCache) {
+    public MediaSource getMediaSource(String uri, Map<String, String> headers, boolean isCache, CacheConfig cacheConfig) {
         Uri contentUri = Uri.parse(uri);
         if ("rtmp".equals(contentUri.getScheme())) {
             return new ProgressiveMediaSource.Factory(new RtmpDataSource.Factory())
@@ -75,7 +71,7 @@ public final class ExoMediaSourceHelper {
         int contentType = inferContentType(uri);
         DataSource.Factory factory;
         if (isCache) {
-            factory = getCacheDataSourceFactory();
+            factory = getCacheDataSourceFactory(cacheConfig);
         } else {
             factory = getDataSourceFactory();
         }
@@ -104,21 +100,39 @@ public final class ExoMediaSourceHelper {
         }
     }
 
-    private DataSource.Factory getCacheDataSourceFactory() {
-        if (mCache == null) {
-            mCache = newCache();
-        }
-        return new CacheDataSource.Factory()
-                .setCache(mCache)
+    private DataSource.Factory getCacheDataSourceFactory(CacheConfig cacheConfig) {
+        Cache cache = getOrCreateCache(cacheConfig);
+        CacheDataSource.Factory factory = new CacheDataSource.Factory()
+                .setCache(cache)
                 .setUpstreamDataSourceFactory(getDataSourceFactory())
                 .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
+        if (cacheConfig != null && cacheConfig.cacheKeyResolver != null) {
+            final CacheKeyResolver resolver = cacheConfig.cacheKeyResolver;
+            factory.setCacheKeyFactory(new CacheKeyFactory() {
+                @Override
+                public String buildCacheKey(DataSpec dataSpec) {
+                    return resolver.resolveKey(dataSpec.uri.toString());
+                }
+            });
+        }
+        return factory;
     }
 
-    private Cache newCache() {
-        return new SimpleCache(
-                new File(mAppContext.getExternalCacheDir(), "exo-video-cache"),//缓存目录
-                new LeastRecentlyUsedCacheEvictor(512 * 1024 * 1024),//缓存大小，默认512M，使用LRU算法实现
-                new StandaloneDatabaseProvider(mAppContext));
+    private Cache getOrCreateCache(CacheConfig cacheConfig) {
+        File dir = cacheConfig != null && cacheConfig.cacheDir != null
+                ? cacheConfig.cacheDir
+                : new File(mAppContext.getExternalCacheDir(), "exo-video-cache");
+        long maxBytes = cacheConfig != null ? cacheConfig.cacheMaxBytes : (512L * 1024 * 1024);
+        String key = dir.getAbsolutePath() + "_" + maxBytes;
+        Cache cache = mCaches.get(key);
+        if (cache == null) {
+            cache = new SimpleCache(
+                    dir,
+                    new LeastRecentlyUsedCacheEvictor(maxBytes),
+                    new StandaloneDatabaseProvider(mAppContext));
+            mCaches.put(key, cache);
+        }
+        return cache;
     }
 
     /**
@@ -163,7 +177,4 @@ public final class ExoMediaSourceHelper {
         }
     }
 
-    public void setCache(Cache cache) {
-        this.mCache = cache;
-    }
 }

@@ -29,7 +29,7 @@ import xyz.doikki.videoplayer.player.VideoViewManager
  * 基于 AndroidX Media3 ExoPlayer 的播放器实现。
  */
 @UnstableApi
-class Media3ExoPlayer(context: Context) : AbstractPlayer(), Player.Listener {
+class Media3ExoPlayer(context: Context, private val cacheConfig: CacheConfig? = null) : AbstractPlayer(), Player.Listener {
 
     protected val appContext: Context = context.applicationContext
     protected var mediaSourceHelper: Media3ExoSourceHelperImpl = Media3ExoSourceHelper.getInstance(context)
@@ -78,7 +78,8 @@ class Media3ExoPlayer(context: Context) : AbstractPlayer(), Player.Listener {
 
     override fun setDataSource(path: String?, headers: Map<String, String>?) {
         if (path != null) {
-            mediaSource = mediaSourceHelper.getMediaSource(path, headers)
+            val use = cacheConfig?.useBuiltInCache == true
+            mediaSource = mediaSourceHelper.getMediaSource(path, headers, use, cacheConfig)
         }
     }
 

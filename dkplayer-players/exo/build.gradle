@@ -24,6 +24,7 @@ dependencies {
     api "com.google.android.exoplayer:exoplayer-hls:${project.ext.exoPlayerVersion}"
     api "com.google.android.exoplayer:exoplayer-rtsp:${project.ext.exoPlayerVersion}"
     api "com.google.android.exoplayer:extension-rtmp:${project.ext.exoPlayerVersion}"
+    api "androidx.annotation:annotation:1.9.1"
 }
 
 ext {

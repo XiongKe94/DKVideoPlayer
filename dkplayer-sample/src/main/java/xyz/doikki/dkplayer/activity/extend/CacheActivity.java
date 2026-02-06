@@ -1,6 +1,5 @@
 package xyz.doikki.dkplayer.activity.extend;
 
-import com.danikula.videocache.HttpProxyCacheServer;
 import xyz.doikki.dkplayer.R;
 import xyz.doikki.dkplayer.activity.BaseActivity;
 import xyz.doikki.dkplayer.util.DataUtil;
@@ -24,8 +23,7 @@ public class CacheActivity extends BaseActivity<VideoView> {
     protected void initView() {
         super.initView();
         mVideoView = findViewById(R.id.video_view);
-        HttpProxyCacheServer cacheServer = ProxyVideoCacheManager.getProxy(this);
-        String proxyUrl = cacheServer.getProxyUrl(DataUtil.SAMPLE_URL);
+        String proxyUrl = ProxyVideoCacheManager.getProxy(this).getProxyUrl(DataUtil.SAMPLE_URL);
         mVideoView.setUrl(proxyUrl);
         StandardVideoController controller = new StandardVideoController(this);
         controller.addDefaultControlComponent(getString(R.string.str_cache), false);

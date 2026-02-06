@@ -13,6 +13,7 @@ import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.CacheKeyFactory
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.datasource.rtmp.RtmpDataSource
@@ -21,6 +22,7 @@ import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.rtsp.RtspMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import xyz.doikki.videoplayer.media3.CacheConfig
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
@@ -44,18 +46,9 @@ object Media3ExoSourceHelper {
 class Media3ExoSourceHelperImpl(private val appContext: Context) {
     private val userAgent: String = Util.getUserAgent(appContext, appContext.applicationInfo.name)
     private var httpDataSourceFactory: DefaultHttpDataSource.Factory? = null
-    private var cache: Cache? = null
+    private val caches = ConcurrentHashMap<String, Cache>()
 
-    fun getMediaSource(uri: String): MediaSource =
-        getMediaSource(uri, null, false)
-
-    fun getMediaSource(uri: String, headers: Map<String, String>?): MediaSource =
-        getMediaSource(uri, headers, false)
-
-    fun getMediaSource(uri: String, isCache: Boolean): MediaSource =
-        getMediaSource(uri, null, isCache)
-
-    fun getMediaSource(uri: String, headers: Map<String, String>?, isCache: Boolean): MediaSource {
+    fun getMediaSource(uri: String, headers: Map<String, String>?, isCache: Boolean, cacheConfig: CacheConfig? = null): MediaSource {
         val contentUri = Uri.parse(uri)
         when (contentUri.scheme) {
             "rtmp" -> {
@@ -68,7 +61,7 @@ class Media3ExoSourceHelperImpl(private val appContext: Context) {
         }
         val contentType = inferContentType(uri)
         val factory: DataSource.Factory = if (isCache) {
-            cacheDataSourceFactory()
+            cacheDataSourceFactory(cacheConfig)
         } else {
             dataSourceFactory()
         }
@@ -95,21 +88,28 @@ class Media3ExoSourceHelperImpl(private val appContext: Context) {
         }
     }
 
-    private fun cacheDataSourceFactory(): DataSource.Factory {
-        val c = cache ?: newCache().also { cache = it }
-        return CacheDataSource.Factory()
-            .setCache(c)
+    private fun cacheDataSourceFactory(cacheConfig: CacheConfig?): DataSource.Factory {
+        val cache = getOrCreateCache(cacheConfig)
+        val factory = CacheDataSource.Factory()
+            .setCache(cache)
             .setUpstreamDataSourceFactory(dataSourceFactory())
             .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+        cacheConfig?.cacheKeyResolver?.let { resolver ->
+            factory.setCacheKeyFactory { dataSpec -> resolver.resolveKey(dataSpec.uri.toString()) }
+        }
+        return factory
     }
 
-    private fun newCache(): Cache {
-        val dir = File(appContext.getExternalCacheDir(), "media3-video-cache")
-        return SimpleCache(
-            dir,
-            LeastRecentlyUsedCacheEvictor(512 * 1024 * 1024),
-            StandaloneDatabaseProvider(appContext)
-        )
+    private fun getOrCreateCache(cacheConfig: CacheConfig?): Cache {
+        val dir = cacheConfig?.cacheDir ?: File(appContext.externalCacheDir, "media3Exo-video-cache")
+        val maxBytes = cacheConfig?.cacheMaxBytes ?: (512L * 1024 * 1024)
+        val key = dir.absolutePath + "_" + maxBytes
+        return caches.getOrPut(key) {
+            SimpleCache(dir,
+                LeastRecentlyUsedCacheEvictor(maxBytes),
+                StandaloneDatabaseProvider(appContext)
+            )
+        }
     }
 
     private fun dataSourceFactory(): DataSource.Factory {
@@ -139,7 +139,4 @@ class Media3ExoSourceHelperImpl(private val appContext: Context) {
         factory.setDefaultRequestProperties(mutableHeaders)
     }
 
-    fun setCache(cache: Cache) {
-        this.cache = cache
-    }
 }

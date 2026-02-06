@@ -4,8 +4,11 @@ import androidx.multidex.MultiDexApplication;
 
 import com.danikula.videocache.Logger;
 
+import java.io.File;
+
 import xyz.doikki.videoplayer.BuildConfig;
-import xyz.doikki.videoplayer.player.AndroidMediaPlayerFactory;
+import xyz.doikki.videoplayer.media3.CacheConfig;
+import xyz.doikki.videoplayer.media3.Media3ExoPlayerFactory;
 import xyz.doikki.videoplayer.player.VideoViewConfig;
 import xyz.doikki.videoplayer.player.VideoViewManager;
 
@@ -30,7 +33,15 @@ public class MyApplication extends MultiDexApplication {
 //                .setPlayerFactory(AndroidMediaPlayerFactory.create()) //不推荐使用，兼容性较差
                 // .setPlayerFactory(Media3ExoPlayerFactory.create())
                 /** 硬解，支持格式看手机，请使用CpuInfoActivity检查手机支持的格式，结合 {@link xyz.doikki.dkplayer.widget.videoview.ExoVideoView} 使用更佳 */
-                .setPlayerFactory(AndroidMediaPlayerFactory.create())
+                .setPlayerFactory(Media3ExoPlayerFactory.create()
+                        .setCacheConfig(CacheConfig.builder()
+                                .setUseBuiltInCache(true)
+                                .setCacheDir(new File(getCacheDir(), "video-cache"))
+                                .setCacheKeyResolver(url -> {
+                                    int i = url.indexOf('?');
+                                    return i >= 0 ? url.substring(0, i) : url;
+                                })
+                                .build()))
                 // 设置自己的渲染view，内部默认TextureView实现
 //                .setRenderViewFactory(SurfaceRenderViewFactory.create())
                 // 根据手机重力感应自动切换横竖屏，默认false
